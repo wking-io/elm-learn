@@ -1,0 +1,46 @@
+module Main exposing (..)
+
+import Html exposing (..)
+import Html.Attributes exposing (..)
+
+
+main : Html msg
+main =
+    div [ class "container" ]
+        [ nav [ class "nav" ]
+            [ h1 [ class "nav__title" ] [ text "elm-learn" ]
+            ]
+        , section [ class "content" ]
+            [ div [ class "quiz" ]
+                [ header [ class "quiz__header" ]
+                    [ p [ class "quiz__header__title" ] [ text "Multiple Choice" ]
+                    , p [ class "quiz__header__progress" ] [ text "1/2" ]
+                    ]
+                , div [ class "quiz__body" ]
+                    [ div [ class "quiz__body__question" ]
+                        [ h2 [ class "quiz__body__question__title" ] [ text "Choose the method that solves the problem below:" ]
+                        , pre [ class "quiz__body__question__example" ] [ text "_________ [] == True" ]
+                        ]
+                    , Html.form [ class "quiz__body__form" ]
+                        [ div [ class "quiz__body__form__option" ]
+                            [ input [ class "quiz__body__form__input", type_ "radio", id "answer-isempty", name "answer", value "isEmpty" ] []
+                            , label [ class "quiz__body__form__label", for "answer-isempty" ] [ text "List.isEmpty" ]
+                            ]
+                        , div [ class "quiz__body__form__option" ]
+                            [ input [ class "quiz__body__form__input", type_ "radio", id "answer-member", name "answer", value "member" ] []
+                            , label [ class "quiz__body__form__label", for "answer-member" ] [ text "List.member" ]
+                            ]
+                        , div [ class "quiz__body__form__option" ]
+                            [ input [ class "quiz__body__form__input", type_ "radio", id "answer-reverse", name "answer", value "reverse" ] []
+                            , label [ class "quiz__body__form__label", for "answer-reverse" ] [ text "List.reverse" ]
+                            ]
+                        , div [ class "quiz__body__form__option" ]
+                            [ input [ class "quiz__body__form__input", type_ "radio", id "answer-length", name "answer", value "length" ] []
+                            , label [ class "quiz__body__form__label", for "answer-length" ] [ text "List.length" ]
+                            ]
+                        , input [ class "quiz__body__form__submit", type_ "submit", disabled True, value "Submit Answer" ] []
+                        ]
+                    ]
+                ]
+            ]
+        ]
