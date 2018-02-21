@@ -1,7 +1,6 @@
 module QuizProgress
     exposing
-        ( answer
-        , decodeQuiz
+        ( decodeQuiz
         , emptyQuestion
         , getCurrent
         , getId
@@ -9,9 +8,13 @@ module QuizProgress
         , getExample
         , getOptions
         , getAnswer
+        , getProgressCount
+        , getTotal
         , initProgress
         , initQuiz
+        , nextQuestion
         , shuffleQuestions
+        , updateAnswer
         , QuizProgress
         , Question
         )
@@ -166,8 +169,8 @@ asCurrentQuestionIn (QuizProgress { complete, current, remaining }) newQuestion 
     QuizProgress { complete = complete, current = newQuestion, remaining = remaining }
 
 
-answer : String -> QuizProgress -> QuizProgress
-answer response progress =
+updateAnswer : String -> QuizProgress -> QuizProgress
+updateAnswer response progress =
     case progress of
         QuizProgress { complete, current, remaining } ->
             response
@@ -207,9 +210,46 @@ emptyQuestion =
     }
 
 
+nextQuestion : QuizProgress -> ( QuizProgress, Bool )
+nextQuestion (QuizProgress { complete, current, remaining }) =
+    let
+        nextQuestion =
+            List.head remaining
+
+        newRemaining =
+            List.tail remaining
+    in
+        case nextQuestion of
+            Just next ->
+                case newRemaining of
+                    Just remain ->
+                        ( QuizProgress { complete = current :: complete, current = next, remaining = remain }, False )
+
+                    Nothing ->
+                        ( QuizProgress { complete = current :: complete, current = next, remaining = [] }, False )
+
+            Nothing ->
+                ( QuizProgress { complete = complete, current = current, remaining = remaining }, True )
+
+
 getCurrent : QuizProgress -> Question
 getCurrent (QuizProgress { complete, current, remaining }) =
     current
+
+
+getTotal : QuizProgress -> Int
+getTotal (QuizProgress { complete, current, remaining }) =
+    [ complete, remaining ]
+        |> List.map List.length
+        |> List.sum
+        |> (+) 1
+
+
+getProgressCount : QuizProgress -> Int
+getProgressCount (QuizProgress { complete, current, remaining }) =
+    complete
+        |> List.length
+        |> (+) 1
 
 
 getId : Question -> String

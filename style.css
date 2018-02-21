@@ -104,6 +104,13 @@ body {
   left: -9999px;
 }
 
+.quiz__body__form__input:checked + label,
+.quiz__body__form__input:focus + label,
+.quiz__body__form__input:active + label {
+  background-color: #444659;
+  color: white;
+}
+
 .quiz__body__form__label {
   border-top: 1px solid #444659;
   padding: 4rem;
