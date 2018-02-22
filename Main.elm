@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
+import Views.Quiz
 import QuizProgress exposing (..)
 import Random exposing (..)
 import ListModule
@@ -49,6 +50,7 @@ viewQuizOption option =
                 , id unique
                 , name "answer"
                 , value option
+                , onFocus (UpdateAnswer option)
                 ]
                 []
             , label
@@ -65,7 +67,6 @@ viewQuizSubmit =
     input
         [ class "quiz__body__form__submit"
         , type_ "submit"
-        , disabled True
         , value "Submit Answer"
         ]
         []
@@ -82,7 +83,7 @@ viewQuizForm ( maybeAnswer, options ) =
                 Nothing ->
                     ""
     in
-        Html.form [ class "quiz__body__form" ]
+        Html.form [ class "quiz__body__form", onSubmit (SubmitAnswer answer), action "javascript:void(0);" ]
             (List.append
                 (List.map viewQuizOption options)
                 (List.singleton viewQuizSubmit)
@@ -150,6 +151,7 @@ view model =
 
 type Msg
     = SubmitAnswer String
+    | UpdateAnswer String
     | BuildQuiz (List Question)
 
 
@@ -169,6 +171,14 @@ update msg model =
                   }
                 , Cmd.none
                 )
+
+        UpdateAnswer newAnswer ->
+            let
+                newProgress =
+                    model.questions
+                        |> updateAnswer newAnswer
+            in
+                ( { model | questions = newProgress }, Cmd.none )
 
         BuildQuiz shuffledQuestions ->
             ( { model | questions = (initProgress shuffledQuestions) }, Cmd.none )
