@@ -10,6 +10,7 @@ module QuizProgress
         , getAnswer
         , getProgressCount
         , getTotal
+        , getGrade
         , initProgress
         , initQuiz
         , nextQuestion
@@ -36,18 +37,11 @@ type alias Question =
 
 
 type QuizProgress
-    = QuizProgress
-        { complete : List Question
-        , current : Question
-        , remaining : List Question
-        }
+    = QuizProgress (List Question) Question (List Question)
 
 
 type alias InitialProgress =
-    { complete : List Question
-    , current : Question
-    , remaining : List Question
-    }
+    ( List Question, Question, List Question )
 
 
 questionDecoder : Decoder Question
@@ -165,17 +159,15 @@ asAnswerIn question newAnswer =
 
 
 asCurrentQuestionIn : QuizProgress -> Question -> QuizProgress
-asCurrentQuestionIn (QuizProgress { complete, current, remaining }) newQuestion =
-    QuizProgress { complete = complete, current = newQuestion, remaining = remaining }
+asCurrentQuestionIn (QuizProgress complete current remaining) newQuestion =
+    QuizProgress complete newQuestion remaining
 
 
 updateAnswer : String -> QuizProgress -> QuizProgress
-updateAnswer response progress =
-    case progress of
-        QuizProgress { complete, current, remaining } ->
-            response
-                |> asAnswerIn current
-                |> asCurrentQuestionIn progress
+updateAnswer response ((QuizProgress complete current remaining) as original) =
+    response
+        |> asAnswerIn current
+        |> asCurrentQuestionIn original
 
 
 initProgress : List Question -> QuizProgress
@@ -197,7 +189,7 @@ initProgress questions =
                 Nothing ->
                     []
     in
-        QuizProgress { complete = [], current = maybeCurrent, remaining = maybeRemaining }
+        QuizProgress [] maybeCurrent maybeRemaining
 
 
 emptyQuestion : Question
@@ -211,7 +203,7 @@ emptyQuestion =
 
 
 nextQuestion : QuizProgress -> ( QuizProgress, Bool )
-nextQuestion (QuizProgress { complete, current, remaining }) =
+nextQuestion ((QuizProgress complete current remaining) as original) =
     let
         nextQuestion =
             List.head remaining
@@ -223,22 +215,22 @@ nextQuestion (QuizProgress { complete, current, remaining }) =
             Just next ->
                 case newRemaining of
                     Just remain ->
-                        ( QuizProgress { complete = current :: complete, current = next, remaining = remain }, False )
+                        ( QuizProgress (current :: complete) next remain, False )
 
                     Nothing ->
-                        ( QuizProgress { complete = current :: complete, current = next, remaining = [] }, False )
+                        ( QuizProgress (current :: complete) next [], False )
 
             Nothing ->
-                ( QuizProgress { complete = complete, current = current, remaining = remaining }, True )
+                ( original, True )
 
 
 getCurrent : QuizProgress -> Question
-getCurrent (QuizProgress { complete, current, remaining }) =
+getCurrent (QuizProgress _ current _) =
     current
 
 
 getTotal : QuizProgress -> Int
-getTotal (QuizProgress { complete, current, remaining }) =
+getTotal (QuizProgress complete _ remaining) =
     [ complete, remaining ]
         |> List.map List.length
         |> List.sum
@@ -246,10 +238,41 @@ getTotal (QuizProgress { complete, current, remaining }) =
 
 
 getProgressCount : QuizProgress -> Int
-getProgressCount (QuizProgress { complete, current, remaining }) =
+getProgressCount (QuizProgress complete _ _) =
     complete
         |> List.length
         |> (+) 1
+
+
+isCorrect : Question -> Bool
+isCorrect question =
+    let
+        maybeAnswer =
+            case question.answer of
+                Just answer ->
+                    answer
+
+                Nothing ->
+                    ""
+    in
+        maybeAnswer == question.id
+
+
+getGrade : QuizProgress -> ( String, String )
+getGrade (QuizProgress complete current _) =
+    let
+        questions =
+            current :: complete
+
+        total =
+            List.length questions
+
+        correct =
+            questions
+                |> List.filter isCorrect
+                |> List.length
+    in
+        ( (toString (round (((toFloat correct) / (toFloat total)) * 100))) ++ "%", (toString correct) ++ "/" ++ (toString total) )
 
 
 getId : Question -> String

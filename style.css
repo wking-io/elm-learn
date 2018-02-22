@@ -139,3 +139,72 @@ body {
   opacity: 0.5;
   cursor: default;
 }
+
+.btn--underline {
+  text-decoration: none;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 4rem;
+  font-weight: bold;
+  color: #444659;
+  background-image: linear-gradient(
+    rgba(68, 70, 89, 0.25),
+    rgba(68, 70, 89, 0.25)
+  );
+  background-size: 100% 0.375em;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+}
+
+.btn--underline:hover,
+.btn--underline:focus {
+  background-image: linear-gradient(
+    rgba(68, 70, 89, 0.4),
+    rgba(68, 70, 89, 0.4)
+  );
+}
+
+.btn--underline:active,
+.btn--underline:focus {
+  outline: none;
+}
+
+.btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  background-color: transparent;
+  border: none;
+  border: 1px solid #444659;
+  border-radius: 0;
+  padding: 1em 2em 0.9em;
+  font-weight: 600;
+  letter-spacing: 0.0125em;
+  cursor: pointer;
+  color: #444659;
+}
+
+.btn:hover,
+.btn:focus {
+  color: white;
+  background-color: #444659;
+}
+
+.btn:active,
+.btn:focus {
+  outline: none;
+}
+
+.btn--primary {
+  color: white;
+  background-color: #444659;
+}
+
+.btn--primary:hover,
+.btn--primary:focus {
+  background-color: transparent;
+  color: #444659;
+}

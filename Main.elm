@@ -21,6 +21,7 @@ main =
 type alias Model =
     { questions : QuizProgress
     , isComplete : Bool
+    , showReview : Bool
     }
 
 
@@ -28,6 +29,7 @@ initialModel : Model
 initialModel =
     { questions = initProgress []
     , isComplete = False
+    , showReview = False
     }
 
 
@@ -116,7 +118,19 @@ viewQuiz progress =
 
 viewResult : QuizProgress -> Html Msg
 viewResult progress =
-    h1 [] [ text "You did it!" ]
+    let
+        ( grade, exact ) =
+            getGrade progress
+    in
+        div [ class "tc w-100" ]
+            [ h1 [] [ text grade ]
+            , p [] [ text ("You got " ++ exact ++ " correct!") ]
+            , button [ type_ "button", class "btn--underline mb1" ] [ text "Review your answers here!" ]
+            , div [ class "flex justify-center w-75 center mt5" ]
+                [ button [ class "w-50 mr3 btn" ] [ text "Try Again" ]
+                , button [ class "w-50 ml3 btn" ] [ text "Main Menu" ]
+                ]
+            ]
 
 
 view : Model -> Html Msg
